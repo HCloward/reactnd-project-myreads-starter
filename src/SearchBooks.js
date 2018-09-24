@@ -5,9 +5,31 @@ import Book from './Book'
 
 class SearchBooks extends Component {
     state = {
-      query: ""
+        query: "",
+        books: []
     }
 
+    changeShelf = (book, shelf) => {
+        /*
+        let index;
+        for (index = 0; index < this.state.books.length; index++) {
+            if (this.state.books[index].title === book.title) {
+                break;
+            }
+        }
+        this.setState((state)=>{
+            state.books[index].shelf = shelf
+            return state
+        })
+        */
+        let index;
+        for (index = 0; index < this.props.books.length; index++) {
+            if (this.props.books[index].title === book.title) {
+                break;
+            }
+        }
+        this.props.changeShelf(book, shelf)
+    }
 
     updateQuery = (query) => {
         this.setState({ query: query })
@@ -30,7 +52,6 @@ class SearchBooks extends Component {
                 <div className="search-books-bar">
                     <Link 
                         to="/"
-                        onClick={ this.props.getBooks }
                         className="close-search">Close</Link>
                     <div className="search-books-input-wrapper">
                         {/*
@@ -50,7 +71,8 @@ class SearchBooks extends Component {
                         { this.state.query && Array.isArray(this.props.books) ?
                             this.props.books.map((book) => (
                                 <li key={book.title}>
-                                    <Book book={ book } changeShelf={ this.props.changeShelf } />
+                                    <Book book={ book } 
+                                        changeShelf={ this.props.changeShelf } />
                                 </li>
                             ))
                             : ''

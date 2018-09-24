@@ -4,16 +4,35 @@ import Book from './Book'
 
 class Shelf extends Component {
 
+    state = {
+        books: this.props.books
+    }
+
     changeShelf = (book, shelf) => {
-        (new Promise((resolve, reject)=>{
-            this.props.changeShelf(book, shelf)
-            resolve()
-        })).then(
-            this.props.getBooks()
-        )
+        /*
+        let index;
+        for (index = 0; index < this.state.books.length; index++) {
+            if (this.state.books[index].title === book.title) {
+                break;
+            }
+        }
+        this.setState((state)=>{
+            state.books[index].shelf = shelf
+            return state
+        })
+        */
+        let index;
+        for (index = 0; index < this.props.books.length; index++) {
+            if (this.props.books[index].title === book.title) {
+                break;
+            }
+        }
+        this.props.changeShelf(book, shelf)
     }
 
     render() {
+        //console.log(JSON.stringify(this.state.books))
+        //console.log(JSON.stringify(this.props.books))
         return (
             <div className="bookshelf">
                 <h2 className="bookshelf-title">{ this.props.title }</h2>
