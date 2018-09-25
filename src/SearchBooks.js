@@ -5,29 +5,10 @@ import Book from './Book'
 
 class SearchBooks extends Component {
     state = {
-        query: "",
-        books: []
+        query: this.props.query,
     }
 
     changeShelf = (book, shelf) => {
-        /*
-        let index;
-        for (index = 0; index < this.state.books.length; index++) {
-            if (this.state.books[index].title === book.title) {
-                break;
-            }
-        }
-        this.setState((state)=>{
-            state.books[index].shelf = shelf
-            return state
-        })
-        */
-        let index;
-        for (index = 0; index < this.props.books.length; index++) {
-            if (this.props.books[index].title === book.title) {
-                break;
-            }
-        }
         this.props.changeShelf(book, shelf)
     }
 
@@ -37,16 +18,6 @@ class SearchBooks extends Component {
     }
 
     render() {
-        /*
-        let viewBooks
-        if (this.state.query) {
-            const match = new RegExp(escapeRegExp(this.state.query), 'i')
-            viewBooks = this.props.books.filter(book => match.test(book.title) || match.test(book.authors) || match.test(book.categories))
-        } else {
-            viewBooks = []        
-        }
-        */
-
         return (
             <div className="search-books">
                 <div className="search-books-bar">
@@ -68,15 +39,18 @@ class SearchBooks extends Component {
                 </div>
                 <div className="search-books-results">
                     <ol className="books-grid">
-                        { this.state.query && Array.isArray(this.props.books) ?
-                            this.props.books.map((book) => (
-                                <li key={book.title}>
-                                    <Book book={ book } 
-                                        changeShelf={ this.props.changeShelf } />
+                        { this.props.books.length ?
+                            this.props.books.map(book =>
+                                <li key={ book.id }>
+                                    <Book
+                                        book={ book }
+                                        changeShelf={ this.changeShelf }
+                                    />
                                 </li>
-                            ))
-                            : ''
-                        }
+                            ) : this.state.query ?
+                                <h2>Books not found.</h2> :
+                                ""
+                            }
                     </ol>
                 </div>
             </div>

@@ -9,37 +9,35 @@ import SearchBooks from './SearchBooks'
 
 class BooksApp extends Component {
   state = {
-    books: []
+    books: [],
+    queryBooks: [],
+    query: ""
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     BooksAPI.getAll().then(books => {
       this.setState({ books })
     })
   }
+
+
   changeShelf = (book, shelf) => {
-    let index;
-    for (index = 0; index < this.state.books.length; index++) {
-        if (this.state.books[index].title === book.title) {
-            break;
-        }
-    }
-    if (index === this.state.books.length) return;
-    this.setState((state)=>{
-      state.books[index].shelf = shelf
-      return state
-    })
-    BooksAPI.update(book, shelf);
+    book.shelf = shelf;
+    BooksAPI.update(book, shelf).then(() => {
+      this.setState((state) => ({
+        books: state.books.filter((b) => b.title !== book.title).concat([book])
+      }));
+    });
   }
+
+
   queryBooks = (query) => {
     if (query) {
       BooksAPI.search(query).then(books => {
-        this.setState({ books })
+        this.setState({ queryBooks: books, query: query })
       })
     } else {
-      BooksAPI.getAll().then(books => {
-        this.setState({ books })
-      })
+      this.setState({ queryBooks: [], query: "" })
     }
   }
 
@@ -53,21 +51,16 @@ class BooksApp extends Component {
             </div>
             <div className="list-books-content">
               <div>
-                <Shelf
-                  title="Currently Reading"
-                  books={ this.state.books.filter( book => book.shelf === "currentlyReading") }
-                  changeShelf={ this.changeShelf }
-                />
-                <Shelf
-                  title="Want to Read"
-                  books={ this.state.books.filter( book => book.shelf === "wantToRead") }
-                  changeShelf={ this.changeShelf }
-                />
-                <Shelf
-                  title="Read"
-                  books={ this.state.books.filter( book => book.shelf === "read") }
-                  changeShelf={ this.changeShelf }
-                />
+                { [ { filter: "currentlyReading", title: "Currently Reading" },
+                    { filter: "wantToRead", title: "Want to Read" },
+                    { filter: "read", title: "Read" }
+                  ].map((shelf, key) => 
+                    <Shelf key={ key }
+                      title={ shelf.title }
+                      books={ this.state.books.filter( book => book.shelf === shelf.filter) }
+                      changeShelf={ this.changeShelf }
+                    />
+                ) }
               </div>
             </div>
             <div className="open-search">
@@ -80,9 +73,10 @@ class BooksApp extends Component {
 
           <Route path="/search" render={() => 
             <SearchBooks
-              books={ this.state.books }
-              changeShelf={ this.changeShelf }
+              query={ this.state.query }
+              books={ this.state.queryBooks }
               queryBooks={ this.queryBooks }
+              changeShelf={ this.changeShelf }
             />
           } />
         </div>
